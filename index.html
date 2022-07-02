@@ -4,31 +4,33 @@
         <title>Weather</title>
     </head>
     <body>
-        <div class="top-header">
+        <div id="top-header">
             <span>Weather Dashboard</span>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
             
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous" />
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
             <link rel="stylesheet" href="./assets/css/style.css" />
         </div>
         <div class="row">
             <div class="col-md-3">
-                <form>
-                    <div class="form-group">
-                        <label for="city-search">Search for a City:</label>
-                        <input type="text" id="city-search" class="form-control" placeholder="San Diego" />
-                    </div>
-                    <input type="submit" class="btn btn-primary mt-2" value="Search" />
-                </form>
+                <div id="side-panel">
+                    <form>
+                        <div class="form-group">
+                            <label for="search-city" class="h3">Search for a City:</label>
+                            <input type="text" id="search-city" class="form-control" placeholder="San Diego" />
+                        </div>
+                        <input type="submit" id="search" class="btn btn-primary col-12 mt-2" value="Search" />
+                    </form>
+                </div>
             </div>
             <div class="col-md-9">
-                <div class="container">
+                <div id="weather-dashboard">
                     <div id="current-weather"></div>
-                    <h3>
+                    <h3 class="my-3">
                         5 Day Forecast:
                     </h3>
-                    <div id="5-day-forecast" class="d-flex justify-content-between"></div>
+                    <div id="5-day-forecast" class="d-flex flex-wrap"></div>
                 </div>
             </div>
         </div>
