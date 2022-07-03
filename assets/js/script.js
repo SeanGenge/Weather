@@ -97,7 +97,7 @@ function populateForecastDashboard(forecastWeather) {
     for (var i = 0; i < 5; i++) {
         var weather = forecastWeather[i];
         
-        var date = moment.unix(weather.dt, 'X').format('DD/MM/YYYY')
+        var date = moment.unix(weather.dt, 'X').format('DD/MM/YYYY');
         
         // Checks if the current date matches the prevDate. If it does then skip that date until the date is the next day
         if (date === prevDate) {
@@ -149,13 +149,32 @@ function addCityButtons() {
 }
 
 function updateWeatherDashboardSearch(city) {
-    // Updates the whole dashboard when a search is made
-    getCooordFromCity(city).then(function(data) {
-        get7DayWeather(data.lat, data.lon).then(function(data) {
-            populateCurrentWeatherDashboard(city, data.current);
-            populateForecastDashboard(data.daily);
+    var currDate = moment().format('DD/MM/YYYY');
+    var key = city + "_" + currDate;
+    var history = localStorage.getItem(key);
+    
+    if (history !== null) {
+        // Convert object to json again
+        var storedData = JSON.parse(history);
+        // Updates the whole dashboard when a search is made
+        populateCurrentWeatherDashboard(city, storedData.current);
+        populateForecastDashboard(storedData.daily);
+    }
+    else {
+        // Get the data from the API
+        getCooordFromCity(city).then(function(data) {
+            if (data !== -1) {
+                get7DayWeather(data.lat, data.lon).then(function(data) {
+                    // Save the data in local storage
+                    localStorage.setItem(key, JSON.stringify(data));
+                    
+                    // Updates the whole dashboard when a search is made
+                    populateCurrentWeatherDashboard(city, data.current);
+                    populateForecastDashboard(data.daily);
+                });
+            }
         });
-    });
+    }
 }
 
 // program start

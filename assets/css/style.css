@@ -27,6 +27,7 @@
     border: 1px solid black;
     border-radius: 0;
     margin: 5px;
+    line-height: 2rem;
 }
 
 .custom-btn {
