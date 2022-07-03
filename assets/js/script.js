@@ -11,7 +11,7 @@ var cities = ["Austin", "Chicago", "New York", "Orlando", "San Francisco", "Seat
 async function getCooordFromCity(cityName) {
     // Returns an object for lat and lon based on the city name
     // Returns -1 if city was not found
-    var cityCoord = await fetch("http://api.openweathermap.org/geo/1.0/direct?q=" + cityName + "&limit=" + limit + "&appid=" + apiKey)
+    var cityCoord = await fetch("https://api.openweathermap.org/geo/1.0/direct?q=" + cityName + "&limit=" + limit + "&appid=" + apiKey)
     .then(function(response) {
         return response.json();
     })
@@ -30,7 +30,7 @@ async function getCooordFromCity(cityName) {
 
 async function get7DayWeather(lat, lon) {
     // Returns the current weather over 7 days based on the latitude and longitude
-    var forecast = await fetch("http://api.openweathermap.org/data/2.5/onecall?exclude=minutely,hourly,alerts&lat=" + lat + "&lon=" + lon + "&units=" + units + "&appid=" + apiKey)
+    var forecast = await fetch("https://api.openweathermap.org/data/2.5/onecall?exclude=minutely,hourly,alerts&lat=" + lat + "&lon=" + lon + "&units=" + units + "&appid=" + apiKey)
     .then(function(response) {
         return response.json();
     })
@@ -140,7 +140,7 @@ function populateForecastDashboard(forecastWeather) {
 
 function getWeatherIconUrl(weather) {
     // Returns the weather icon class based on the weather
-    return "http://openweathermap.org/img/wn/" + weather[0].icon + "@2x.png";
+    return "https://openweathermap.org/img/wn/" + weather[0].icon + "@2x.png";
 }
 
 function addCityButtons() {
