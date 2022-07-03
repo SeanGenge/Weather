@@ -4,7 +4,7 @@
 }
 
 #top-header {
-    height: 100px;
+    height: 75px;
     text-align: center;
     font-size: 32px;
     font-weight: bolder;
@@ -26,8 +26,9 @@
     color: white;
     border: 1px solid black;
     border-radius: 0;
-    margin: 5px;
     line-height: 2rem;
+    margin: 8px;
+    padding: 5px 0 0 10px;
 }
 
 .custom-btn {
@@ -70,4 +71,12 @@ form {
 
 .purple {
     background-color: purple;
+}
+
+.custom-icon-sm {
+    width: 10%;
+}
+
+.custom-icon-lg {
+    width: 25%;
 }

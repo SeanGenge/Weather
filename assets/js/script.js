@@ -49,8 +49,13 @@ function populateCurrentWeatherDashboard(city, currentWeather) {
     
     dashboard.empty();
     
-    var heading = $("<h1>");
+    var heading = $("<div>");
     heading.text(city + " " + currentDate);
+    heading.addClass("h2");
+    
+    var weatherIcon = $("<img>");
+    weatherIcon.attr('src', getWeatherIconUrl(currentWeather.weather));
+    weatherIcon.addClass("custom-icon-sm");
     
     // Do the uvi separately so you can change the background colour based on the uvi
     var uvi = $("<span>");
@@ -83,12 +88,13 @@ function populateCurrentWeatherDashboard(city, currentWeather) {
               
     info.append(uvi);
     
+    heading.append(weatherIcon);
     dashboard.append(heading, info);
 }
 
 function populateForecastDashboard(forecastWeather) {
     // Adds the 5 day forecast to the dashboard
-    var dashboard = $("#5-day-forecast");
+    var dashboard = $("#forecast");
     // Keep track of the previous date
     var prevDate = "";
     
@@ -117,15 +123,24 @@ function populateForecastDashboard(forecastWeather) {
         title.addClass("card-title")
         title.text(date);
         
+        var weatherIcon = $("<img>");
+        weatherIcon.attr('src', getWeatherIconUrl(weather.weather));
+        weatherIcon.addClass("custom-icon-lg");
+        
         var info = $("<p>");
         info.addClass("card-text")
         info.html("Temp: " + weather.temp.day + tempUnit + "<br />" +
                 "Wind: " + weather.wind_speed + windUnit + "<br />" +
                 "Humidity: " + weather.humidity + humidityUnit);
         
-        card.append(title, info);
+        card.append(title, weatherIcon, info);
         dashboard.append(card);
     }
+}
+
+function getWeatherIconUrl(weather) {
+    // Returns the weather icon class based on the weather
+    return "http://openweathermap.org/img/wn/" + weather[0].icon + "@2x.png";
 }
 
 function addCityButtons() {
@@ -159,6 +174,7 @@ function updateWeatherDashboardSearch(city) {
         // Updates the whole dashboard when a search is made
         populateCurrentWeatherDashboard(city, storedData.current);
         populateForecastDashboard(storedData.daily);
+        console.log(storedData);
     }
     else {
         // Get the data from the API
