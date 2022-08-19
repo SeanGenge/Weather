@@ -1,7 +1,12 @@
-A weather app to display a weather forecast for different cities.
-Uses the OpenWeather One Call API to get the weather data
+# Weather App
 
-Deployed app: https://seangenge.github.io/Weather/
+## Description
+A weather app that uses the OpenWeather API to display the current and 5 day forecast weather data on a dashboard. You can search for cities with your search results saved on the left side. The results are also saved in localStorage for faster response times.
+
+the app is deployed to https://seangenge.github.io/Weather/
+
+## Usage
+To use the code, git clone to your pc
 
 Example look at the app:
-![](./assets/weather%20dashboard.png)
+![](./assets/images/weather_dashboard.png)
