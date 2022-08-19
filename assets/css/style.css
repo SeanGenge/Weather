@@ -1,6 +1,12 @@
 #current-weather {
     border: 1px solid black;
     padding: 5px;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 0 5px black;
+    padding-left: 25px;
+    padding-bottom: 15px;
+    width: 95%;
 }
 
 #top-header {
@@ -10,6 +16,10 @@
     font-weight: bolder;
     background-image: linear-gradient(to right, rgba(0, 71, 171, 1), rgba(112, 41, 99, 1));
     color: white;
+}
+
+#top-header > div {
+    padding-top: 15px;
 }
 
 #side-panel {
@@ -24,15 +34,21 @@
     width: 12rem;
     background-color: #1434A4;
     color: white;
-    border: 1px solid black;
-    border-radius: 0;
     line-height: 2rem;
+    border: 0;
     margin: 8px;
-    padding: 5px 0 0 10px;
+    padding: 5px 0 10px 10px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #1434A4;
 }
 
 .custom-btn {
     margin-bottom: 10px;
+    border: none;
+}
+
+.custom-btn:hover {
+    background-color: darkgreen;
 }
 
 form {

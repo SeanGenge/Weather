@@ -6,7 +6,7 @@ var units = "metric";
 var tempUnit = units === "metric" ? "\u00B0C" : "\u00B0F";
 var windUnit = units === "metric" ? "KPH" : "MPH";
 var humidityUnit = "%";
-var cities = ["Austin", "Chicago", "New York", "Orlando", "San Francisco", "Seattle", "Denver", "Atlanta"];
+var cities = [];
 
 async function getCooordFromCity(cityName) {
     // Returns an object for lat and lon based on the city name
@@ -100,7 +100,7 @@ function populateForecastDashboard(forecastWeather) {
     
     dashboard.empty();
     
-    for (var i = 0; i < 5; i++) {
+    for (var i = 1; i <= 5; i++) {
         var weather = forecastWeather[i];
         
         var date = moment.unix(weather.dt, 'X').format('DD/MM/YYYY');
@@ -143,15 +143,18 @@ function getWeatherIconUrl(weather) {
     return "https://openweathermap.org/img/wn/" + weather[0].icon + "@2x.png";
 }
 
-function addCityButtons() {
+function populateCityButtons() {
     // Adds all the city buttons on the side panel
     var sidePanel = $("#side-panel");
+    
+    // Remove all the elements in the side panel first
+    $("div.city-btn").remove();
     
     for (var c = 0; c < cities.length; c++) {
         var currCity = cities[c];
         
         var cityBtn = $("<div>");
-        cityBtn.addClass("btn btn-secondary col-12 custom-btn");
+        cityBtn.addClass("btn btn-secondary col-12 custom-btn city-btn");
         cityBtn.text(currCity);
         
         // Event handler for the buttons
@@ -159,6 +162,7 @@ function addCityButtons() {
             updateWeatherDashboardSearch(event.target.innerHTML);
         });
         
+        // Append the button to the side panel
         sidePanel.append(cityBtn);
     }
 }
@@ -174,7 +178,6 @@ function updateWeatherDashboardSearch(city) {
         // Updates the whole dashboard when a search is made
         populateCurrentWeatherDashboard(city, storedData.current);
         populateForecastDashboard(storedData.daily);
-        console.log(storedData);
     }
     else {
         // Get the data from the API
@@ -191,15 +194,21 @@ function updateWeatherDashboardSearch(city) {
             }
         });
     }
+    
+    // Add the city to the button
+    cities.push(city);
+    populateCityButtons();
 }
 
 // program start
-addCityButtons();
-updateWeatherDashboardSearch("San Diego");
+updateWeatherDashboardSearch("Melbourne");
 // Event handler when searching
 $("#search").on("click", function(event) {
     event.preventDefault();
     
     var city = $("#search-city").val();
     updateWeatherDashboardSearch(city);
+    
+    // Clear the text box
+    $("#search-city").val('');
 });
