@@ -5,6 +5,13 @@ A weather app that uses the OpenWeather API to display the current and 5 day for
 
 the app is deployed to https://seangenge.github.io/Weather/
 
+## Tools/Languages
+ - JQuery
+ - Bootstrap
+ - HTML
+ - CSS
+ - OpenWeather API
+
 ## Usage
 To use the code, git clone to your pc
 
