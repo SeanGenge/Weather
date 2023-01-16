@@ -196,7 +196,8 @@ function updateWeatherDashboardSearch(city) {
     }
     
     // Add the city to the button
-    cities.push(city);
+    if (!cities.includes(city))
+        cities.push(city);
     populateCityButtons();
 }
 
