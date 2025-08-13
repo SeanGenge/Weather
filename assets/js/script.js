@@ -83,7 +83,7 @@ function populateCurrentWeatherDashboard(city, currentWeather) {
     
     // Adds the current weather to the dashboard
     var dashboard = $("#current-weather");
-    var currentDate = moment(currentWeather.time, 'X').format('DD/MM/YYYY');
+    var currentDate = moment(currentWeather.time, 'X').format('DD/MM/YY');
     
     dashboard.empty();
     
@@ -119,13 +119,12 @@ function populateCurrentWeatherDashboard(city, currentWeather) {
     
     var info = $("<div>");
     info.html("<i>" + weatherCodeMap[currentWeather.weather_code] + "</i><br />" +
-              "Temp: " + currentWeather.temperature_2m + tempUnit + "<br />" +
+              currentWeather.temperature_2m + tempUnit + "<br />" +
               "Wind: " + currentWeather.wind_speed_10m + " " + windUnit + "<br />" +
-              "Humidity: " + currentWeather.relative_humidity_2m + humidityUnit + "<br />" + 
-              "UV Index: ");
+              "Humidity: " + currentWeather.relative_humidity_2m + humidityUnit + "<br />");
     info.addClass("info");
               
-    info.append(uvi);
+    // info.append(uvi);
     
     heading.append(weatherIcon);
     dashboard.append(heading, info);
@@ -146,7 +145,7 @@ function populateForecastDashboard(forecastWeather) {
         var uv_index = forecastWeather.uv_index_max[i];
         var weather = weatherCodeMap[forecastWeather.weather_code[i]];
         var wind_speed = forecastWeather.wind_speed_10m_max[i];
-        var date = moment.unix(forecastWeather.time[i], 'X').format('DD/MM/YYYY');
+        var date = moment.unix(forecastWeather.time[i], 'X').format('DD/MM/YY');
         
         // Checks if the current date matches the prevDate. If it does then skip that date until the date is the next day
         if (date === prevDate) {
@@ -157,7 +156,7 @@ function populateForecastDashboard(forecastWeather) {
         }
     
         var card = $("<div>");
-        card.addClass("card custom-card");
+        card.addClass("card custom-card card-background");
         
         var cardBody = $("<div>");
         cardBody.addClass("card-body")
@@ -173,8 +172,7 @@ function populateForecastDashboard(forecastWeather) {
         var info = $("<p>");
         info.addClass("card-text")
         info.html("<i>" + weather + "</i><br />" +
-                  "Min Temp: " + temperature_min + tempUnit + "<br />" +
-                  "Max Temp: " + temperature_max + tempUnit + "<br />" +
+                  temperature_min + tempUnit + " / " + temperature_max + tempUnit + "<br />" +
                   "Wind: " + wind_speed + " " + windUnit + "<br />" +
                   "Humidity: " + humidity + humidityUnit);
         
@@ -199,7 +197,7 @@ function populateCityButtons() {
         var currCity = cities[c];
         
         var cityBtn = $("<div>");
-        cityBtn.addClass("btn btn-secondary col-12 custom-btn city-btn");
+        cityBtn.addClass("btn btn-secondary col-12 custom-btn city-btn card-background");
         cityBtn.text(currCity);
         
         // Event handler for the buttons
@@ -216,6 +214,20 @@ function updateWeatherDashboardSearch(city) {
     var currDate = moment().format('DD/MM/YYYY');
     var key = city + "_" + currDate;
     var history = localStorage.getItem(key);
+    
+    // Clear local storage if it is too big
+    if (localStorage.length > 7) {
+        localStorage.clear();
+    }
+    
+    var temp = JSON.parse(history);
+    
+    // Checks if it is a valid object first
+    if (history !== null && !temp.daily && !temp.current) {
+        history = null;
+        // Clear all entries. There is something wrong there
+        localStorage.clear();
+    }
     
     if (history !== null) {
         // Convert object to json again
