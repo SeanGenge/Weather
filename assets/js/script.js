@@ -1,24 +1,60 @@
-var apiKey = "53661fc62fb03d43161d6b8715167666";
+var apiKey = "e46abbf48964013584fabd6f43563219";
 var limit = 5;
 // Can change the units to metric or imperial
 var units = "metric";
 // Change the tempUnits and windUnits based on the unit
 var tempUnit = units === "metric" ? "\u00B0C" : "\u00B0F";
-var windUnit = units === "metric" ? "KPH" : "MPH";
+var windUnit = units === "metric" ? "KM/H" : "MPH";
 var humidityUnit = "%";
 var cities = [];
+
+// From https://open-meteo.com/en/docs at the bottom
+const weatherCodeMap = {
+    0: "Clear sky",
+    1: "Mainly clear",
+    2: "Partly cloudy",
+    3: "Overcast",
+    45: "Fog",
+    48: "Depositing rime fog",
+    51: "Drizzle: Light intensity",
+    53: "Drizzle: Moderate intensity",
+    55: "Drizzle: Dense intensity",
+    56: "Freezing drizzle: Light intensity",
+    57: "Freezing drizzle: Dense intensity",
+    61: "Rain: Slight intensity",
+    63: "Rain: Moderate intensity",
+    65: "Rain: Heavy intensity",
+    66: "Freezing rain: Light intensity",
+    67: "Freezing rain: Heavy intensity",
+    71: "Snow fall: Slight intensity",
+    73: "Snow fall: Moderate intensity",
+    75: "Snow fall: Heavy intensity",
+    77: "Snow grains",
+    80: "Rain showers: Slight intensity",
+    81: "Rain showers: Moderate intensity",
+    82: "Rain showers: Violent intensity",
+    85: "Snow showers: Slight intensity",
+    86: "Snow showers: Heavy intensity",
+    95: "Thunderstorm: Slight or moderate",
+    // Central Europe only
+    // 96: "Thunderstorm with slight hail",
+    // 99: "Thunderstorm with heavy hail"
+};
+
 
 async function getCooordFromCity(cityName) {
     // Returns an object for lat and lon based on the city name
     // Returns -1 if city was not found
-    var cityCoord = await fetch("https://api.openweathermap.org/geo/1.0/direct?q=" + cityName + "&limit=" + limit + "&appid=" + apiKey)
+    var cityCoord = await fetch("https://geocoding-api.open-meteo.com/v1/search?name=" + cityName + "&count=" + limit + "&language=en&format=json")
     .then(function(response) {
         return response.json();
     })
     .then(function(data) {
-        for (var i = 0; i < data.length; i++) {
-            if (data[i].name.toLowerCase() === cityName.toLowerCase()) {
-                return { "city": cityName.toLowerCase(), "lat": data[i].lat, "lon": data[i].lon };
+        for (var i = 0; i < data.results.length; i++) {
+            const currResult = data.results[i];
+            
+            if (currResult.name.toLowerCase() === cityName.toLowerCase()) {
+                return { "city": cityName.toLowerCase(), "lat": currResult.latitude, "lon": currResult.longitude };
             }
         }
         
@@ -30,7 +66,7 @@ async function getCooordFromCity(cityName) {
 
 async function get7DayWeather(lat, lon) {
     // Returns the current weather over 7 days based on the latitude and longitude
-    var forecast = await fetch("https://api.openweathermap.org/data/2.5/onecall?exclude=minutely,hourly,alerts&lat=" + lat + "&lon=" + lon + "&units=" + units + "&appid=" + apiKey)
+    var forecast = await fetch("https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,wind_speed_10m_max,relative_humidity_2m_mean&current=temperature_2m,relative_humidity_2m,is_day,wind_speed_10m,weather_code&timezone=Australia%2FSydney&timeformat=unixtime")
     .then(function(response) {
         return response.json();
     })
@@ -43,9 +79,11 @@ async function get7DayWeather(lat, lon) {
 }
 
 function populateCurrentWeatherDashboard(city, currentWeather) {
+    if (!city || !currentWeather) return;
+    
     // Adds the current weather to the dashboard
     var dashboard = $("#current-weather");
-    var currentDate = moment(currentWeather.dt, 'X').format('DD/MM/YYYY');
+    var currentDate = moment(currentWeather.time, 'X').format('DD/MM/YYYY');
     
     dashboard.empty();
     
@@ -54,7 +92,7 @@ function populateCurrentWeatherDashboard(city, currentWeather) {
     heading.addClass("h2");
     
     var weatherIcon = $("<img>");
-    weatherIcon.attr('src', getWeatherIconUrl(currentWeather.weather));
+    // weatherIcon.attr('src', getWeatherIconUrl(currentWeather.weather));
     weatherIcon.addClass("custom-icon-sm");
     
     // Do the uvi separately so you can change the background colour based on the uvi
@@ -80,9 +118,10 @@ function populateCurrentWeatherDashboard(city, currentWeather) {
     }
     
     var info = $("<div>");
-    info.html("Temp: " + currentWeather.temp + tempUnit + "<br />" +
-              "Wind: " + currentWeather.wind_speed + windUnit + "<br />" +
-              "Humidity: " + currentWeather.humidity + humidityUnit + "<br />" + 
+    info.html("<i>" + weatherCodeMap[currentWeather.weather_code] + "</i><br />" +
+              "Temp: " + currentWeather.temperature_2m + tempUnit + "<br />" +
+              "Wind: " + currentWeather.wind_speed_10m + " " + windUnit + "<br />" +
+              "Humidity: " + currentWeather.relative_humidity_2m + humidityUnit + "<br />" + 
               "UV Index: ");
     info.addClass("info");
               
@@ -100,10 +139,14 @@ function populateForecastDashboard(forecastWeather) {
     
     dashboard.empty();
     
-    for (var i = 1; i <= 5; i++) {
-        var weather = forecastWeather[i];
-        
-        var date = moment.unix(weather.dt, 'X').format('DD/MM/YYYY');
+    for (var i = 1; i <= 6; i++) {
+        var humidity = forecastWeather.relative_humidity_2m_mean[i];
+        var temperature_min = forecastWeather.temperature_2m_min[i];
+        var temperature_max = forecastWeather.temperature_2m_max[i];
+        var uv_index = forecastWeather.uv_index_max[i];
+        var weather = weatherCodeMap[forecastWeather.weather_code[i]];
+        var wind_speed = forecastWeather.wind_speed_10m_max[i];
+        var date = moment.unix(forecastWeather.time[i], 'X').format('DD/MM/YYYY');
         
         // Checks if the current date matches the prevDate. If it does then skip that date until the date is the next day
         if (date === prevDate) {
@@ -124,14 +167,16 @@ function populateForecastDashboard(forecastWeather) {
         title.text(date);
         
         var weatherIcon = $("<img>");
-        weatherIcon.attr('src', getWeatherIconUrl(weather.weather));
+        // weatherIcon.attr('src', getWeatherIconUrl(weather.weather));
         weatherIcon.addClass("custom-icon-lg");
         
         var info = $("<p>");
         info.addClass("card-text")
-        info.html("Temp: " + weather.temp.day + tempUnit + "<br />" +
-                "Wind: " + weather.wind_speed + windUnit + "<br />" +
-                "Humidity: " + weather.humidity + humidityUnit);
+        info.html("<i>" + weather + "</i><br />" +
+                  "Min Temp: " + temperature_min + tempUnit + "<br />" +
+                  "Max Temp: " + temperature_max + tempUnit + "<br />" +
+                  "Wind: " + wind_speed + " " + windUnit + "<br />" +
+                  "Humidity: " + humidity + humidityUnit);
         
         card.append(title, weatherIcon, info);
         dashboard.append(card);
@@ -175,6 +220,7 @@ function updateWeatherDashboardSearch(city) {
     if (history !== null) {
         // Convert object to json again
         var storedData = JSON.parse(history);
+        
         // Updates the whole dashboard when a search is made
         populateCurrentWeatherDashboard(city, storedData.current);
         populateForecastDashboard(storedData.daily);
@@ -186,7 +232,6 @@ function updateWeatherDashboardSearch(city) {
                 get7DayWeather(data.lat, data.lon).then(function(data) {
                     // Save the data in local storage
                     localStorage.setItem(key, JSON.stringify(data));
-                    
                     // Updates the whole dashboard when a search is made
                     populateCurrentWeatherDashboard(city, data.current);
                     populateForecastDashboard(data.daily);

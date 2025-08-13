@@ -1,3 +1,14 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* body {
+    background: linear-gradient(to bottom right, #002b7f, #3a7bd5);
+} */
+
 #current-weather {
     border: 1px solid black;
     padding: 5px;
